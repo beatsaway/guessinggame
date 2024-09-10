@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animal Emoji Pattern Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        #game-area {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+            max-width: 600px;
+            width: 100%;
+        }
+        .row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+        }
+        .text {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            margin-right: 10px;
+        }
+        .emojis {
+            display: flex;
+            gap: 5px;
+        }
+        .emoji {
+            transition: opacity 0.3s ease;
+            opacity: 0;
+        }
+        .visible {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-area"></div>
+
+    <script>
+        const emojis = [
+            [
+                { emoji: '🐊', size: '16px' },
+                { emoji: '🐊', size: '20px' },
+                { emoji: '🐊', size: '24px' },
+                { emoji: '🐊', size: '28px' },
+                { emoji: '🐊', size: '32px' },
+            ],
+            [
+                { emoji: '🧸', size: '16px' },
+                { emoji: '🧸', size: '20px' },
+                { emoji: '🧸', size: '24px' },
+                { emoji: '🧸', size: '28px' },
+            ],
+            [
+                { emoji: '🐔', size: '16px' },
+                { emoji: '🐔', size: '20px' },
+                { emoji: '🐔', size: '24px' },
+            ],
+            [
+                { emoji: '🦆', size: '16px' },
+                { emoji: '🦆', size: '20px' },
+            ],
+            [
+                { emoji: '🐘', size: '16px' },
+            ]
+        ];
+
+        const quotes = [
+            "Five alligators are crossing the road.",
+            "Four bears are crossing the road.",
+            "Three chickens are crossing the road.",
+            "Two ducks are crossing the road.",
+            "An elephant is crossing the road."
+        ];
+
+        let visibleCount = 0;
+        let totalEmojiCount = emojis.flat().length;
+        let gameState = 0; // 0: initial, 1: all revealed, 2: first words purple, 3: second words magenta
+
+        function createEmojiElements() {
+            const gameArea = document.getElementById('game-area');
+            emojis.forEach((row, rowIndex) => {
+                const rowDiv = document.createElement('div');
+                rowDiv.classList.add('row');
+                
+                const emojisDiv = document.createElement('div');
+                emojisDiv.classList.add('emojis');
+                row.forEach((item, colIndex) => {
+                    const span = document.createElement('span');
+                    span.textContent = item.emoji;
+                    span.style.fontSize = item.size;
+                    span.classList.add('emoji');
+                    span.id = `emoji-${rowIndex}-${colIndex}`;
+                    emojisDiv.appendChild(span);
+                });
+                rowDiv.appendChild(emojisDiv);
+
+                const textDiv = document.createElement('div');
+                textDiv.classList.add('text');
+                textDiv.innerHTML = quotes[rowIndex].split(' ').map((word, index) => 
+                    `<span id="word-${rowIndex}-${index}">${word}</span>`
+                ).join(' ');
+                textDiv.id = `text-${rowIndex}`;
+                rowDiv.appendChild(textDiv);
+
+                gameArea.appendChild(rowDiv);
+            });
+        }
+
+        function handleClick() {
+            switch (gameState) {
+                case 0:
+                    revealNextEmoji();
+                    break;
+                case 1:
+                    makeFirstWordsPurple();
+                    break;
+                case 2:
+                    makeSecondWordsMagenta();
+                    break;
+                case 3:
+                    resetGame();
+                    break;
+            }
+        }
+
+        function revealNextEmoji() {
+            if (visibleCount < totalEmojiCount) {
+                let currentIndex = 0;
+                for (let i = 0; i < emojis.length; i++) {
+                    if (visibleCount < currentIndex + emojis[i].length) {
+                        const colIndex = visibleCount - currentIndex;
+                        document.getElementById(`emoji-${i}-${colIndex}`).classList.add('visible');
+                        
+                        if (colIndex === emojis[i].length - 1) {
+                            document.getElementById(`text-${i}`).classList.add('visible');
+                        }
+                        
+                        break;
+                    }
+                    currentIndex += emojis[i].length;
+                }
+                visibleCount++;
+            } else {
+                gameState = 1;
+            }
+        }
+
+        function makeFirstWordsPurple() {
+            for (let i = 0; i < quotes.length; i++) {
+                const firstWord = document.getElementById(`word-${i}-0`);
+                firstWord.style.color = 'purple';
+                firstWord.style.fontWeight = 'bold';
+            }
+            gameState = 2;
+        }
+
+        function makeSecondWordsMagenta() {
+            for (let i = 0; i < quotes.length; i++) {
+                const secondWord = document.getElementById(`word-${i}-1`);
+                secondWord.style.color = '#FF00FF';
+                secondWord.style.fontWeight = 'bold';
+            }
+            gameState = 3;
+        }
+
+        function resetGame() {
+            visibleCount = 0;
+            gameState = 0;
+            document.querySelectorAll('.emoji, .text').forEach(el => el.classList.remove('visible'));
+            document.querySelectorAll('.text span').forEach(el => {
+                el.style.color = '';
+                el.style.fontWeight = '';
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            createEmojiElements();
+            document.body.addEventListener('click', handleClick);
+        });
+    </script>
+</body>
+</html>

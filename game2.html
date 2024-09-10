@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emoji Prediction Patterns</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        #buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #display-area {
+            font-size: 48px;
+            min-height: 200px;
+            min-width: 300px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            border: 2px dashed #ccc;
+            padding: 20px;
+            cursor: pointer;
+        }
+        .emoji {
+            transition: all 0.3s ease;
+        }
+        .emoji-large {
+            font-size: 1.5em;
+        }
+        .new-row {
+            width: 100%;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="buttons">
+        <button onclick="startPrediction(1)">What's next?</button>
+        <button onclick="startPrediction(2)">What's next??</button>
+        <button onclick="startPrediction(3)">What's next???</button>
+    </div>
+    <div id="display-area" onclick="showNextEmoji()"></div>
+
+    <script>
+        const pattern = ['🍎', '🍎', '🍌', '🥥', '🍎', '🍌', '🍌', '🥥', '🍎', '🍌', '🥥', '🥥'];
+        let currentIndex = 0;
+        let currentPrediction = 0;
+
+        function startPrediction(predictionNumber) {
+            currentPrediction = predictionNumber;
+            currentIndex = 0;
+            const displayArea = document.getElementById('display-area');
+            displayArea.innerHTML = '';
+            
+            // Hide other buttons
+            const buttons = document.querySelectorAll('#buttons button');
+            buttons.forEach((button, index) => {
+                if (index + 1 !== predictionNumber) {
+                    button.classList.add('hidden');
+                }
+            });
+        }
+
+        function showNextEmoji() {
+            if (currentPrediction === 0) return;
+
+            const displayArea = document.getElementById('display-area');
+            const emojiSpan = document.createElement('span');
+            emojiSpan.className = 'emoji';
+            emojiSpan.textContent = pattern[currentIndex];
+
+            // Check if the current emoji is the same as the previous one
+            if (currentIndex > 0 && pattern[currentIndex] === pattern[currentIndex - 1]) {
+                emojiSpan.classList.add('emoji-large');
+            }
+
+            if (currentPrediction === 1) {
+                displayArea.innerHTML = '';
+            } else if (currentPrediction === 3 && pattern[currentIndex] === '🍎' && 
+                       (currentIndex === 0 || pattern[currentIndex - 1] !== '🍎')) {
+                const newRow = document.createElement('div');
+                newRow.className = 'new-row';
+                displayArea.appendChild(newRow);
+            }
+
+            displayArea.appendChild(emojiSpan);
+            currentIndex++;
+
+            // Reset if we've shown all emojis
+            if (currentIndex === pattern.length) {
+                currentIndex = 0;
+                currentPrediction = 0;
+                // Show all buttons
+                const buttons = document.querySelectorAll('#buttons button');
+                buttons.forEach(button => button.classList.remove('hidden'));
+            }
+        }
+    </script>
+</body>
+</html>

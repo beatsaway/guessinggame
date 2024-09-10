@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Selector</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 10px;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        #game-selector {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 5px;
+            font-size: 14px;
+        }
+        #game-frame {
+            width: 100%;
+            height: calc(100vh - 20px);
+            border: none;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <select id="game-selector">
+        <option value="">Select</option>
+        <option value="game1.html">crossing</option>
+        <option value="game2.html">fruits</option>
+    </select>
+    <iframe id="game-frame" src="about:blank"></iframe>
+
+    <script>
+        const gameSelector = document.getElementById('game-selector');
+        const gameFrame = document.getElementById('game-frame');
+
+        gameSelector.addEventListener('change', function() {
+            if (this.value) {
+                gameFrame.src = this.value;
+            } else {
+                gameFrame.src = 'about:blank';
+            }
+        });
+    </script>
+</body>
+</html>
